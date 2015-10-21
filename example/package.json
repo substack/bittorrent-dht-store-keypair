@@ -1,0 +1,17 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dht_store.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "bittorrent-dht": "^4.0.3",
+    "bittorrent-dht-store-keypair": "^3.0.2",
+    "minimist": "^1.2.0",
+    "path": "^0.12.7"
+  }
+}
