@@ -1,6 +1,6 @@
 {
   "name": "bittorrent-dht-store-keypair",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "create and load signing keys for bittorrent-dht dht_store",
   "main": "index.js",
   "directories": {
@@ -8,15 +8,20 @@
     "test": "test"
   },
   "dependencies": {
-    "defined": "^1.0.0",
-    "ed25519-supercop": "^1.0.0",
-    "sha.js": "^2.4.2"
+    "jssha": "^2.3.1",
+    "supercop.wasm": "^3.0.1"
   },
   "devDependencies": {
     "bittorrent-dht": "^7.6.0",
-    "tape": "^4.2.0"
+    "browserify": "^14.4.0",
+    "tape": "^4.2.0",
+    "uglifyjs": "^2.4.11"
   },
   "scripts": {
+    "build": "npm run prepare && npm run build-browser && npm run uglify",
+    "prepare": "rm -r dist && mkdir dist",
+    "build-browser": "browserify -s bittorrent_dht_store_keypair -o dist/index.browser.js index.js && cp node_modules/supercop.wasm/supercop.wasm dist/",
+    "uglify": "uglifyjs dist/index.browser.js > dist/index.browser.min.js",
     "test": "tape test/*.js"
   },
   "repository": {
@@ -37,5 +42,8 @@
   "bugs": {
     "url": "https://github.com/substack/bittorrent-dht-store-keypair/issues"
   },
-  "homepage": "https://github.com/substack/bittorrent-dht-store-keypair#readme"
+  "homepage": "https://github.com/substack/bittorrent-dht-store-keypair#readme",
+  "jspm": {
+    "main": "index.browser.js"
+  }
 }

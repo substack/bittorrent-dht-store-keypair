@@ -1,6 +1,5 @@
-var ed = require('ed25519-supercop')
-var sha = require('sha.js')
-var defined = require('defined')
+var ed = require('supercop.wasm')
+var JSSHA = require('jssha/src/sha1')
 
 module.exports = KP
 
@@ -10,31 +9,34 @@ function KP (opts) {
   this.secretKey = opts.secretKey
   this.publicKey = opts.publicKey
   if (typeof this.secretKey === 'string') {
-    this.secretKey = Buffer(this.secretKey, 'hex')
+    this.secretKey = Buffer.from(this.secretKey, 'hex')
   }
   if (typeof this.publicKey === 'string') {
-    this.publicKey = Buffer(this.publicKey, 'hex')
+    this.publicKey = Buffer.from(this.publicKey, 'hex')
   }
   if (!this.secretKey && !this.publicKey) {
     var kp = ed.createKeyPair(this.seed || ed.createSeed())
     this.secretKey = kp.secretKey
     this.publicKey = kp.publicKey
   }
-  this.id = sha('sha1').update(this.publicKey).digest('hex')
-  this.seq = defined(opts.seq, 0)
+  var shaObj = new JSSHA('SHA-1', 'ARRAYBUFFER')
+  shaObj.update(this.publicKey)
+  this.id = shaObj.getHash('HEX')
+  this.seq = 'seq' in opts ? opts.seq : 0
 }
 
 KP.prototype.sign = function (value) {
+  if (typeof value === 'string') value = Buffer.from(value)
   return ed.sign(value, this.publicKey, this.secretKey)
 }
 
 KP.prototype.store = function (value, opts) {
   var self = this
   if (!opts) opts = {}
-  if (typeof value === 'string') value = Buffer(value)
-  var seq = defined(opts.seq, this.seq)
+  if (typeof value === 'string') value = Buffer.from(value)
+  var seq = 'seq' in opts ? opts.seq : this.seq
   if (opts.seq === undefined) this.seq ++
-  var salt = typeof opts.salt === 'string' ? Buffer(opts.salt) : opts.salt
+  var salt = typeof opts.salt === 'string' ? Buffer.from(opts.salt) : opts.salt
   return {
     k: this.publicKey,
     seq: seq,
