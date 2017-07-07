@@ -4,7 +4,6 @@ var KP = require('../')
 
 test('dht hex keys', function (t) {
   t.plan(3)
-  var value = new Buffer(200).fill('abc')
   var dht0 = new DHT({ bootstrap: false, verify: KP.verify })
   var dht1 = new DHT({ bootstrap: false, verify: KP.verify })
   var kp0 = new KP({
@@ -18,10 +17,12 @@ test('dht hex keys', function (t) {
   })
 
   dht0.listen(function () {
-    dht1.addNode('127.0.0.1:' + dht0._port)
+    dht1.addNode({host: '127.0.0.1', port: dht0.address().port})
     dht1.once('node', function () {
-      dht0.put(kp0.store('wow'), function (errors, hash) {
-        errors.forEach(t.error)
+      dht0.put(kp0.store('wow'), function (error, hash) {
+        if (error) {
+          t.fail(error.message)
+        }
         t.equal(
           hash.toString('hex'),
           'f3f10aff933ed0b79bdbf3de21fe426f482f14fc'
@@ -37,7 +38,6 @@ test('dht hex keys', function (t) {
 
 test('dht generated key', function (t) {
   t.plan(2)
-  var value = new Buffer(200).fill('abc')
   var dht0 = new DHT({ bootstrap: false, verify: KP.verify })
   var dht1 = new DHT({ bootstrap: false, verify: KP.verify })
   var kp0 = new KP
@@ -47,10 +47,12 @@ test('dht generated key', function (t) {
   })
 
   dht0.listen(function () {
-    dht1.addNode('127.0.0.1:' + dht0._port)
+    dht1.addNode({host: '127.0.0.1', port: dht0.address().port})
     dht1.once('node', function () {
-      dht0.put(kp0.store('wow'), function (errors, hash) {
-        errors.forEach(t.error)
+      dht0.put(kp0.store('wow'), function (error, hash) {
+        if (error) {
+          t.fail(error.message)
+        }
         dht1.get(hash, function (err, node) {
           t.ifError(err)
           t.equal(node.v.toString(), 'wow')
