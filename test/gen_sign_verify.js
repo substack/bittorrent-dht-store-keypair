@@ -1,16 +1,16 @@
 var test = require('tape')
 var KP = require('../')
-var ed = require('ed25519-supercop')
+var ed = require('supercop.wasm')
 
 test('generate, sign, verify', function (t) {
   t.plan(4)
   var kp = new KP()
-  var msg = 'whatever'
+  var msg = Buffer.from('whatever')
   var sig = kp.sign(msg)
   var xsig = xmod(sig)
   var xmsg = xmod(msg)
   var xpk = xmod(kp.publicKey)
- 
+
   t.ok(ed.verify(sig, msg, kp.publicKey))
   t.notOk(ed.verify(xsig, msg, kp.publicKey))
   t.notOk(ed.verify(sig, xmsg, kp.publicKey))
