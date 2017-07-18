@@ -27,7 +27,7 @@ function KP (opts) {
 
 KP.prototype.sign = function (value) {
   if (typeof value === 'string') value = Buffer.from(value)
-  return ed.sign(value, this.publicKey, this.secretKey)
+  return Buffer.from(ed.sign(value, this.publicKey, this.secretKey))
 }
 
 KP.prototype.store = function (value, opts) {
@@ -38,13 +38,11 @@ KP.prototype.store = function (value, opts) {
   if (opts.seq === undefined) this.seq ++
   var salt = typeof opts.salt === 'string' ? Buffer.from(opts.salt) : opts.salt
   return {
-    k: this.publicKey,
+    k: Buffer.from(this.publicKey),
     seq: seq,
     salt: salt,
     v: value,
-    sign: function (buf) {
-      return ed.sign(buf, self.publicKey, self.secretKey)
-    }
+    sign: self.sign.bind(self)
   }
 }
 
